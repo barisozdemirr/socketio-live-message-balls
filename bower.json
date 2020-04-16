@@ -1,0 +1,11 @@
+{
+  "name": "socketio-message-balls",
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "https://github.com/barisozdemirr/socketio-message-balls",
+  "dependencies": {
+    "angular": "^1.7.9",
+    "semantic": "^2.4.1"
+  }
+}
