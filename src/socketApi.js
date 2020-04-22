@@ -6,6 +6,9 @@ socketApi.io = io;
 
 const users = { };
 
+// Helper
+const randomColor = require("../helpers/randomColor");
+
 
 io.on("connection", (socket) => {
     console.log("A user connected!"); 
@@ -16,11 +19,11 @@ io.on("connection", (socket) => {
             position : {
                 x : 0,
                 y : 0
-            }
+            },
+            color: randomColor()
         };
         const userData = Object.assign(data, defaultData);
         users[socket.id] = userData;
-        console.log(users);
         socket.broadcast.emit("newUser", users[socket.id]);
 
         socket.emit("initPlayers", users )
@@ -35,11 +38,20 @@ io.on("connection", (socket) => {
 
 
     socket.on("animate", (data) => {
+       try{
         users[socket.id].position.x = data.x;
         users[socket.id].position.y = data.y;
 
         socket.broadcast.emit("animate", { socketId : socket.id, x: data.x, y: data.y });
+       } catch(e){
+           console.log(e);
+       }
 
+    });
+
+    socket.on("newMessage", (data) => {
+        const messageData = Object.assign({ socketId : socket.id }, data);
+        socket.broadcast.emit("newMessage", messageData);
     });
 
 });
