@@ -1,4 +1,4 @@
-app.controller("indexController", ["$scope", "indexFactory", ($scope, indexFactory) => {
+app.controller("indexController", ["$scope", "indexFactory", "configFactory", ($scope, indexFactory, configFactory) => {
     
     $scope.messages = [];
     $scope.players = {};
@@ -30,18 +30,21 @@ app.controller("indexController", ["$scope", "indexFactory", ($scope, indexFacto
     }
     
     // Bağlantı
-    function initSocket (username)  {
-        indexFactory.connectSocket("http://localhost:3000", {
+
+    async function initSocket (username)  {
+    try {
+        const socketUrl = await configFactory.getConfig();
+
+        const socket = await indexFactory.connectSocket(socketUrl.data.socketUrl, {
             reconnectionAttempts : 3,
             reconnectionDelay : 500
-        }).then((socket) => {
+        });
             socket.emit("newUser", { username } )
 
             socket.on("initPlayers", (players) => {
                 $scope.players=  players;
                 $scope.$apply();
-            });
-
+            
             //Kullanıcı Giriş Yaptığı Zaman
             socket.on("newUser", (data) => {
                 const messageData = {
@@ -123,10 +126,9 @@ app.controller("indexController", ["$scope", "indexFactory", ($scope, indexFacto
                 scrollTop();
 
             };
-
-        }).catch((err) => {
-            console.log(err);
-        });
+        })
+    } catch(err) {
+        console.log(err);
     }
-    
+}
 }]);
